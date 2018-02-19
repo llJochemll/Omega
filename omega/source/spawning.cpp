@@ -41,8 +41,8 @@ namespace omega {
         }
 
         void Zone::spawnInfantryGarrison(std::vector<std::string>& pool_, side& side_, const float skill_) {
-            auto pos = common::findPos(pos, size, 0);
-            const auto building = sqf::nearest_building(pos);
+            const auto spawnPos = common::findPos(pos, size, 0);
+            const auto building = sqf::nearest_building(spawnPos);
             auto grp = sqf::create_group(side_);
 
             for (auto i = 0; i < sqf::building_pos(building, -1).size(); ++i) {
@@ -57,8 +57,8 @@ namespace omega {
         }
 
         void Zone::spawnInfantryPatrol(const int count_, std::vector<std::string>& pool_, side& side_, const float skill_) {
-            auto pos = common::findPos(pos, size, 0, 0);
-            const auto grp = spawnInfantry(pos, count_, pool_, side_, skill_);
+            auto spawnPos = common::findPos(pos, size, 0, 0);
+            const auto grp = spawnInfantry(spawnPos, count_, pool_, side_, skill_);
 
             groupsPatrol.push_back(grp);
             for (const auto unit : sqf::units(grp)) {
@@ -67,9 +67,9 @@ namespace omega {
         }
 
         void Zone::spawnVehicle(std::vector<std::string>& pool_, bool (&crew_)[2], const float skill_) {
-            auto pos = common::findPos(pos, size, 0, 10.0f, -1.0f, true);
+            auto spawnPos = common::findPos(pos, size, 0, 10.0f, -1.0f, true);
             auto grp = sqf::create_group(sd);
-            const auto vehicle = spawning::spawnVehicle(pool_.at(common::randomInt(pool_.size() - 1)), pos, crew_, grp, skill_);
+            const auto vehicle = spawning::spawnVehicle(pool_.at(common::randomInt(pool_.size() - 1)), spawnPos, crew_, grp, skill_);
 
             groupsPatrol.push_back(grp);
             vehicles.push_back(vehicle);
