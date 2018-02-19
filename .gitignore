@@ -351,3 +351,6 @@ ASALocalRun/
 
 # MSBuild Binary and Structured Log
 *.binlog
+
+#need this lib in the repo though
+!intercept_client.lib
