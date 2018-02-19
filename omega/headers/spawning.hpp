@@ -3,9 +3,9 @@
 
 namespace omega {
     namespace spawning {
-        group spawnInfantry(vector3& pos_, int count_, std::vector<std::string>& pool_, side& side_, float skill_);
-        object spawnUnit(std::string& class_, vector3& pos_, group& grp_, float skill_);
-        object spawnVehicle(std::string& class_, vector3& pos_, bool(&crew_)[2], group& grp_, float skill_);
+        group spawnInfantry(const vector3& pos_, const int count_, const std::vector<std::string>& pool_, const side& side_, const float skill_);
+        object spawnUnit(const std::string& class_, const vector3& pos_, const group& grp_, const float skill_);
+        object spawnVehicle(const std::string& class_, const vector3& pos_, const bool(&crew_)[2], const group& grp_, const float skill_);
 
         class Zone {
         private:
@@ -19,13 +19,57 @@ namespace omega {
             side sd{};
             vector3 size{};
 
-            Zone(vector3& pos_, vector3& size_, side& side_);
+            Zone(const vector3& pos_, const vector3& size_, const side& side_);
 
             void clean(); //TODO: implement
 
-            void spawnInfantryGarrison(std::vector<std::string>& pool_, side& side_, float skill_);
-            void spawnInfantryPatrol(int count_, std::vector<std::string>& pool_, side& side_, float skill_);
-            void spawnVehicle(std::vector<std::string>& pool_, bool(&crew_)[2], float skill_);
+            void spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const float skill_);
+            void spawnInfantryPatrol(const int count_, const std::vector<std::string>& pool_, const side& side_, float skill_);
+            void spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool(&crew_)[2], float skill_);
         };
+
+        namespace pools {
+            namespace  blufor {
+                namespace  units {
+                    extern std::vector<std::string> regular;
+                    extern std::vector<std::string> specialForces;
+                }
+                namespace vehicles {
+                    extern std::vector<std::string> apcs;
+                    extern std::vector<std::string> boats;
+                    extern std::vector<std::string> cars;
+                    extern std::vector<std::string> ifvs;
+                    extern std::vector<std::string> tanks;
+                }
+            }
+
+            namespace opfor {
+                namespace units {
+                    extern std::vector<std::string> regular;
+                    extern std::vector<std::string> specialForces;
+                }
+                namespace vehicles {
+                    extern std::vector<std::string> apcs;
+                    extern std::vector<std::string> boats;
+                    extern std::vector<std::string> cars;
+                    extern std::vector<std::string> ifvs;
+                    extern std::vector<std::string> tanks;
+                }
+            }
+
+            namespace greenfor {
+                namespace units {
+                    extern std::vector<std::string> regular;
+                    extern std::vector<std::string> specialForces;
+                }
+                namespace vehicles {
+                    extern std::vector<std::string> apcs;
+                    extern std::vector<std::string> boats;
+                    extern std::vector<std::string> cars;
+                    extern std::vector<std::string> ifvs;
+                    extern std::vector<std::string> tanks;
+                }
+            }
+        }
     }
 }

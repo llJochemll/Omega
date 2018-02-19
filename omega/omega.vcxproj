@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\common.cpp" />
+    <ClCompile Include="source\core.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
+    <ClCompile Include="source\mission.cpp" />
     <ClCompile Include="source\omega.cpp" />
     <ClCompile Include="source\spawning.cpp" />
     <ClCompile Include="source\stdafx.cpp" />
@@ -28,6 +30,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\common.hpp" />
+    <ClInclude Include="headers\core.hpp" />
+    <ClInclude Include="headers\mission.hpp" />
     <ClInclude Include="headers\spawning.hpp" />
     <ClInclude Include="headers\stdafx.hpp" />
     <ClInclude Include="headers\targetver.hpp" />
