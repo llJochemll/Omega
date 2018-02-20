@@ -40,6 +40,69 @@ namespace omega {
             sd = side_;
         }
 
+        void Zone::spawnCombined(const side& side_, const int units_, const int cars_, const int apcs_, const int ifvs_,
+                                 const int tanks_, const int boats_) {
+            std::vector<std::string> poolUnits;
+            std::vector<std::string> poolCars;
+            std::vector<std::string> poolApcs;
+            std::vector<std::string> poolIfvs;
+            std::vector<std::string> poolTanks;
+            std::vector<std::string> poolBoats;
+
+            if (side_ == sqf::west()) {
+                poolUnits = pools::blufor::units::regular;
+                poolCars = pools::blufor::vehicles::cars;
+                poolApcs = pools::blufor::vehicles::apcs;
+                poolIfvs = pools::blufor::vehicles::ifvs;
+                poolTanks = pools::blufor::vehicles::tanks;
+                poolBoats = pools::blufor::vehicles::boats;
+            } else if (side_ == sqf::independent()) {
+                poolUnits = pools::greenfor::units::regular;
+                poolCars = pools::greenfor::vehicles::cars;
+                poolApcs = pools::greenfor::vehicles::apcs;
+                poolIfvs = pools::greenfor::vehicles::ifvs;
+                poolTanks = pools::greenfor::vehicles::tanks;
+                poolBoats = pools::greenfor::vehicles::boats;
+            } else if (side_ == sqf::east()) {
+                poolUnits = pools::opfor::units::regular;
+                poolCars = pools::opfor::vehicles::cars;
+                poolApcs = pools::opfor::vehicles::apcs;
+                poolIfvs = pools::opfor::vehicles::ifvs;
+                poolTanks = pools::opfor::vehicles::tanks;
+                poolBoats = pools::opfor::vehicles::boats;
+            }
+            
+            //Spawn patrolling infantry
+            for (auto i = 0; i < units_; ++i) {
+                spawnInfantryPatrol(5, poolUnits, sqf::east(), 0.5f);
+            }
+
+            //Spawn vehicles: car
+            for (auto i = 0; i < cars_; ++i) {
+                spawnVehiclePatrol(poolCars, { true, false }, 0.5f);
+            }
+
+            //Spawn vehicles: apc
+            for (auto i = 0; i < apcs_; ++i) {
+                spawnVehiclePatrol(poolApcs, { true, false }, 0.5f);
+            }
+
+            //Spawn vehicles: ifv
+            for (auto i = 0; i < ifvs_; ++i) {
+                spawnVehiclePatrol(poolIfvs, { true, false }, 0.5f);
+            }
+
+            //Spawn vehicles: tank
+            for (auto i = 0; i < tanks_; ++i) {
+                spawnVehiclePatrol(poolTanks, { true, false }, 0.5f);
+            }
+
+            //Spawn vehicles: boat
+            for (auto i = 0; i < boats_; ++i) {
+                spawnVehiclePatrol(poolBoats, { true, false }, 0.5f);
+            }
+        }
+
         void Zone::spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const float skill_) {
             auto building = sqf::nearest_building(common::findPos(pos, size, 0));
             while (!sqf::in_area(building, pos, size.x, size.y, size.z, false, 0)) {
