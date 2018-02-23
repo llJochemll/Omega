@@ -1,7 +1,5 @@
 #pragma once
 #include "stdafx.hpp"
-#include "client/sqf/common_helpers.hpp"
-#include "client/pointers.hpp"
 
 namespace omega {
     namespace wrapper {

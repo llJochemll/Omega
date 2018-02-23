@@ -9,14 +9,15 @@ namespace omega {
 
         class Zone {
         private:
-            std::vector<group> groupsGarrison{};
-            std::vector<group> groupsPatrol{};
-            std::vector<object> units{};
-            std::vector<object> vehicles{};
+            
 
         public:
+            std::vector<group> groupsGarrison{};
+            std::vector<group> groupsPatrol{};
             vector3 pos{};
+            std::vector<object> units{};
             side sd{};
+            std::vector<object> vehicles{};
             vector3 size{};
 
             Zone(const vector3& pos_, const vector3& size_, const side& side_);
@@ -31,10 +32,12 @@ namespace omega {
         };
 
         namespace pools {
+            void init();
+
             namespace  blufor {
                 namespace  units {
                     extern std::vector<std::string> regular;
-                    extern std::vector<std::string> specialForces;
+                    extern std::vector<std::string> special;
                 }
                 namespace vehicles {
                     extern std::vector<std::string> apcs;
@@ -48,7 +51,7 @@ namespace omega {
             namespace opfor {
                 namespace units {
                     extern std::vector<std::string> regular;
-                    extern std::vector<std::string> specialForces;
+                    extern std::vector<std::string> special;
                 }
                 namespace vehicles {
                     extern std::vector<std::string> apcs;
@@ -62,7 +65,7 @@ namespace omega {
             namespace greenfor {
                 namespace units {
                     extern std::vector<std::string> regular;
-                    extern std::vector<std::string> specialForces;
+                    extern std::vector<std::string> special;
                 }
                 namespace vehicles {
                     extern std::vector<std::string> apcs;

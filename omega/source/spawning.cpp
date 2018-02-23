@@ -110,8 +110,8 @@ namespace omega {
             }
 
             const auto grp = sqf::create_group(side_);
-            for (auto i = 0; i < sqf::building_pos(building, -1).size(); ++i) {
-                const auto unit = spawnUnit(pool_.at(pool_.size() - 1), sqf::building_pos(building, round(i * common::randomInt(1) + 1)).at(0), grp, skill_);
+            for (auto i = 0; i < sqf::building_pos(building, -1).size() / 2; ++i) {
+                const auto unit = spawnUnit(pool_.at(common::randomInt(pool_.size() - 1)), sqf::building_pos(building, round(i * common::randomInt(1) + 1)).at(0), grp, skill_);
                 sqf::do_stop(unit);
                 units.push_back(unit);
             }
@@ -120,7 +120,7 @@ namespace omega {
         }
 
         void Zone::spawnInfantryPatrol(const int count_, const std::vector<std::string>& pool_, const side& side_, const float skill_) {
-            const auto grp = spawnInfantry(common::findPos(pos, size, 0, 0), count_, pool_, side_, skill_);
+            const auto grp = spawnInfantry(common::findPos(pos, size, 1, 0, 0), count_, pool_, side_, skill_);
 
             groupsPatrol.push_back(grp);
             for (const auto unit : sqf::units(grp)) {
@@ -130,7 +130,7 @@ namespace omega {
 
         void Zone::spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool (&crew_)[2], const float skill_) {
             const auto grp = sqf::create_group(sd);
-            const auto vehicle = spawnVehicle(pool_.at(common::randomInt(pool_.size() - 1)), common::findPos(pos, size, 0, 10.0f, -1.0f, true), crew_, grp, skill_);
+            const auto vehicle = spawnVehicle(pool_.at(common::randomInt(pool_.size() - 1)), common::findPos(pos, size, 10, 0, 10, -1, true), crew_, grp, skill_);
 
             groupsPatrol.push_back(grp);
             vehicles.push_back(vehicle);
@@ -140,10 +140,48 @@ namespace omega {
         }
 
         namespace pools {
+            void init() {
+                opfor::units::regular = {
+                    "O_Soldier_A_F", 
+                    "O_Soldier_AR_F", 
+                    "O_medic_F", 
+                    "O_Soldier_GL_F", 
+                    "O_HeavyGunner_F",
+                    "O_soldier_M_F", 
+                    "O_Soldier_AA_F", 
+                    "O_Soldier_AT_F", 
+                    "O_Soldier_F", 
+                    "O_Soldier_LAT_F",
+                    "O_Sharpshooter_F", 
+                    "O_Soldier_SL_F", 
+                    "O_Soldier_TL_F"
+                };
+                opfor::units::special = {
+                    "O_V_Soldier_hex_F", 
+                    "O_V_Soldier_Medic_hex_F", 
+                    "O_V_Soldier_TL_hex_F", 
+                    "O_V_Soldier_JTAC_hex_F"
+                };
+                opfor::vehicles::apcs = {
+                    "O_APC_Wheeled_02_rcws_F" 
+                };
+                opfor::vehicles::boats = {
+                };
+                opfor::vehicles::cars = {
+                    "O_MRAP_02_F","O_MRAP_02_gmg_F","O_MRAP_02_hmg_F"
+                };
+                opfor::vehicles::ifvs = {
+                    "O_APC_Tracked_02_cannon_F"
+                };
+                opfor::vehicles::tanks = {
+                    "O_MBT_02_cannon_F"
+                };
+            }
+
             namespace  blufor {
                 namespace  units {
                     std::vector<std::string> regular;
-                    std::vector<std::string> specialForces;
+                    std::vector<std::string> special;
                 }
                 namespace vehicles {
                     std::vector<std::string> apcs;
@@ -157,7 +195,7 @@ namespace omega {
             namespace greenfor {
                 namespace units {
                     std::vector<std::string> regular;
-                    std::vector<std::string> specialForces;
+                    std::vector<std::string> special;
                 }
                 namespace vehicles {
                     std::vector<std::string> apcs;
@@ -171,7 +209,7 @@ namespace omega {
             namespace opfor {
                 namespace units {
                     std::vector<std::string> regular;
-                    std::vector<std::string> specialForces;
+                    std::vector<std::string> special;
                 }
                 namespace vehicles {
                     std::vector<std::string> apcs;

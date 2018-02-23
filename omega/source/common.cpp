@@ -18,7 +18,6 @@ namespace omega {
             auto iter = 0;
 
             {
-                vector3 posRad;
                 auto suitable = true;
 
                 while (iter < 10000) {

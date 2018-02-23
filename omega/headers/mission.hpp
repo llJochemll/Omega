@@ -13,7 +13,10 @@ namespace omega {
         };
 
         class MainMission : Mission {
+        public:
             MainMission();
+
+            bool complete() const;
         };
 
         class SideMission : Mission {
@@ -27,5 +30,17 @@ namespace omega {
         class PriorityMission : Mission {
             
         };
+
+        namespace locations {
+            extern std::vector<vector3> airfields;
+            extern std::vector<vector3> bases;
+            extern std::vector<vector3> capitals;
+            extern std::vector<vector3> cities;
+            extern std::vector<vector3> factories;
+            extern std::vector<vector3> villages;
+
+            std::vector<vector3> all();
+            void init();
+        }
     }
 }

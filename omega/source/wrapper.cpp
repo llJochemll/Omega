@@ -1,5 +1,7 @@
 #include "stdafx.hpp"
 #include "wrapper.hpp"
+#include "client/sqf/common_helpers.hpp"
+#include "client/pointers.hpp"
 
 namespace omega {
 	namespace wrapper {
@@ -20,14 +22,14 @@ namespace omega {
 		}
 
 		void reveal(std::variant<object, group> unit_, const object &target_) {
-			game_value param_left;
+			game_value paramLeft;
 			switch (unit_.index()) {
-			case 0: param_left = std::get<0>(unit_); break;
-			case 1: param_left = std::get<1>(unit_); break;
+			case 0: paramLeft = std::get<0>(unit_); break;
+			case 1: paramLeft = std::get<1>(unit_); break;
 			default:;
 			}
 
-			host::functions.invoke_raw_binary(__sqf::binary__reveal__object_group__object__ret__nothing, param_left, target_);
+			host::functions.invoke_raw_binary(__sqf::binary__reveal__object_group__object__ret__nothing, paramLeft, target_);
 		}
 	}
 }

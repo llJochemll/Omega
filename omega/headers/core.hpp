@@ -3,6 +3,7 @@
 
 namespace omega {
     namespace core {
+        void missionInit();
         void missionLoop();
     }
 }
