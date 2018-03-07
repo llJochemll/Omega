@@ -1,6 +1,7 @@
 ﻿#include "stdafx.hpp"
 #include "spawning.hpp"
 #include "common.hpp"
+#include "global.hpp"
 
 namespace omega {
     namespace spawning {
@@ -32,6 +33,32 @@ namespace omega {
             }
 
             return veh;
+        }
+
+        void Zone::patrol(const group& grp_) const {
+            //Without this sleep groups might get stuck in a diamond formation and unable to patrol
+            Sleep(5000);
+            EngineLock engineLock(true);
+            auto patrolPos = common::findPos(pos, size, 5, 0);
+            engineLock.unlock();
+
+            //Patrol while there are units in the group and the group is still in patrollinggroups
+            while (!grp_.is_null() && !sqf::units(grp_).empty() && !sqf::leader(grp_).is_null()) {
+                //Check if a new waypoint needs to be given
+                if (common::distance(sqf::get_pos_atl(sqf::leader(grp_)), patrolPos) < 5) {
+                    patrolPos = common::findPos(pos, size, 5, 0);
+                    sqf::move(grp_, patrolPos);
+                    sqf::set_behaviour(grp_, "SAFE");
+                } else if (sqf::speed(sqf::leader(grp_)) < 1 && sqf::combat_mode(sqf::leader(grp_)) != "COMBAT") {
+                    sqf::move(grp_, patrolPos);
+                    sqf::set_behaviour(grp_, "SAFE");
+                }
+
+                engineLock.unlock();
+                Sleep(10000);
+                engineLock.lock();
+            }
+            
         }
 
         Zone::Zone(const vector3 & pos_, const vector3 & size_, const side& side_) {
@@ -126,6 +153,9 @@ namespace omega {
             for (const auto unit : sqf::units(grp)) {
                 units.push_back(unit);
             }
+
+            //Start patrol in new thread
+            std::thread(&Zone::patrol, this, grp).detach();
         }
 
         void Zone::spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool (&crew_)[2], const float skill_) {

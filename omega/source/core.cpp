@@ -9,6 +9,7 @@ namespace omega {
         std::unique_ptr<mission::SideMission> sideMission;
 
         void missionInit() {
+            mission::buildings::init();
             mission::locations::init();
             spawning::pools::init();
 
@@ -17,7 +18,8 @@ namespace omega {
         }
 
         void missionLoop() {
-            if (mainMission == nullptr || mainMission->complete()) {
+            if (mainMission->complete()) {
+                mainMission->finish();
                 mainMission = std::make_unique<mission::MainMission>();
             }
         }

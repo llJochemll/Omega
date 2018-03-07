@@ -5,7 +5,7 @@
 
 namespace omega {
 	namespace wrapper {
-		std::vector<object> nearestObjects(vector3& pos_, sqf_string_list_const_ref types_, const float radius_, const bool sort_,
+		std::vector<object> nearestObjects(const vector3& pos_, const sqf_string_list_const_ref& types_, const float radius_, const bool sort_,
 		                                    const bool mode2D_) {
 			auto_array<game_value> types(types_.begin(), types_.end());
 

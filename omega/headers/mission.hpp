@@ -6,10 +6,15 @@ namespace omega {
     namespace mission {
         class Mission {
         protected:
-            std::vector<std::unique_ptr<Mission>> subMissions;
-            vector3 pos;
-            task task;
-            std::unique_ptr<spawning::Zone> zone;
+            inline static int globalMissionId = -1;
+            int missionId = -1;
+            marker mrk = "";
+            std::vector<std::unique_ptr<Mission>> subMissions{};
+            vector3 pos = vector3(0,0,0);
+            std::vector<std::string> task{};
+            std::unique_ptr<spawning::Zone> zone{};
+
+            Mission();
         };
 
         class MainMission : Mission {
@@ -17,6 +22,7 @@ namespace omega {
             MainMission();
 
             bool complete() const;
+            void finish() const;
         };
 
         class SideMission : Mission {
@@ -28,8 +34,25 @@ namespace omega {
         };
 
         class PriorityMission : Mission {
-            
+
         };
+
+        namespace buildings {
+            namespace civilian {
+
+            }
+
+            namespace military {
+                extern std::vector<object> towersBig;
+                extern std::vector<object> towersSmall;
+                extern std::vector<object> housesBig;
+                extern std::vector<object> housesSmall;
+
+                std::vector<object> all();
+            }
+
+            void init();
+        }
 
         namespace locations {
             extern std::vector<vector3> airfields;

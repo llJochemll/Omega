@@ -35,6 +35,18 @@
     <ClCompile Include="source\mission.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\rsqf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="headers\ai.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\global.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\stdafx.hpp">
@@ -56,6 +68,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\mission.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\task.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\rsqf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\ai.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\global.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

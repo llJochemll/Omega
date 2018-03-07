@@ -19,22 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="headers\ai.cpp" />
     <ClCompile Include="source\common.cpp" />
     <ClCompile Include="source\core.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
+    <ClCompile Include="source\global.cpp" />
     <ClCompile Include="source\mission.cpp" />
     <ClCompile Include="source\omega.cpp" />
+    <ClCompile Include="source\rsqf.cpp" />
     <ClCompile Include="source\spawning.cpp" />
     <ClCompile Include="source\stdafx.cpp" />
+    <ClCompile Include="source\task.cpp" />
     <ClCompile Include="source\wrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers\ai.hpp" />
     <ClInclude Include="headers\common.hpp" />
     <ClInclude Include="headers\core.hpp" />
+    <ClInclude Include="headers\global.hpp" />
     <ClInclude Include="headers\mission.hpp" />
+    <ClInclude Include="headers\rsqf.hpp" />
     <ClInclude Include="headers\spawning.hpp" />
     <ClInclude Include="headers\stdafx.hpp" />
     <ClInclude Include="headers\targetver.hpp" />
+    <ClInclude Include="headers\task.hpp" />
     <ClInclude Include="headers\wrapper.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
