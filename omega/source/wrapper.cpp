@@ -17,7 +17,8 @@ namespace omega {
 				mode2D_
 				});
 
-			return sqf::__helpers::__convert_to_objects_vector(
+			
+			return sqf::__helpers::__convert_to_vector<object>(
 				host::functions.invoke_raw_unary(__sqf::unary__nearestobjects__array__ret__array, params));
 		}
 

@@ -1,16 +1,16 @@
 ﻿#include "stdafx.hpp"
 #include "spawning.hpp"
 #include "common.hpp"
-#include "global.hpp"
 
 namespace omega {
     namespace spawning {
         group spawnInfantry(const vector3& pos_, const int count_, const std::vector<std::string>& pool_, const side& side_, const float skill_) {
-            auto grp = sqf::create_group(side_);
+            auto grp = sqf::create_group(side_, true);
 
             for (auto i = 0; i < count_; i++) {
                 spawnUnit(pool_.at(common::randomInt(pool_.size() - 1)), pos_, grp, skill_);
             }
+            sqf::enable_dynamic_simulation(grp, true);
 
             return grp;
         }
@@ -30,41 +30,41 @@ namespace omega {
                 for (const auto unit : sqf::crew(veh)) {
                     sqf::set_skill(unit, skill_);
                 }
+                sqf::enable_dynamic_simulation(grp_, true);
+                sqf::enable_dynamic_simulation(veh, true);
             }
 
             return veh;
         }
 
-        void Zone::patrol(const group& grp_) const {
-            //Without this sleep groups might get stuck in a diamond formation and unable to patrol
-            Sleep(5000);
-            EngineLock engineLock(true);
-            auto patrolPos = common::findPos(pos, size, 5, 0);
-            engineLock.unlock();
-
-            //Patrol while there are units in the group and the group is still in patrollinggroups
-            while (!grp_.is_null() && !sqf::units(grp_).empty() && !sqf::leader(grp_).is_null()) {
-                //Check if a new waypoint needs to be given
-                if (common::distance(sqf::get_pos_atl(sqf::leader(grp_)), patrolPos) < 5) {
-                    patrolPos = common::findPos(pos, size, 5, 0);
-                    sqf::move(grp_, patrolPos);
-                    sqf::set_behaviour(grp_, "SAFE");
-                } else if (sqf::speed(sqf::leader(grp_)) < 1 && sqf::combat_mode(sqf::leader(grp_)) != "COMBAT") {
-                    sqf::move(grp_, patrolPos);
-                    sqf::set_behaviour(grp_, "SAFE");
-                }
-
-                engineLock.unlock();
-                Sleep(10000);
-                engineLock.lock();
+        void Zone::patrol(group& grp_) const {
+            for (auto i = 0; i < 5; i++) {
+                auto wp = sqf::add_waypoint(grp_, common::findPos(pos, size, 5, 0), 0);
+                set_waypoint_type(wp, sqf::waypoint::type::MOVE);
+                set_waypoint_speed(wp, sqf::waypoint::speed::LIMITED);
+                set_waypoint_behaviour(wp, sqf::waypoint::behaviour::SAFE);
             }
-            
+
+            auto wp = sqf::add_waypoint(grp_, common::findPos(pos, size, 5, 0), 0);
+            set_waypoint_type(wp, sqf::waypoint::type::CYCLE);
+            set_waypoint_speed(wp, sqf::waypoint::speed::LIMITED);
+            set_waypoint_behaviour(wp, sqf::waypoint::behaviour::SAFE);
         }
 
         Zone::Zone(const vector3 & pos_, const vector3 & size_, const side& side_) {
             pos = pos_;
             size = size_;
             sd = side_;
+        }
+
+        void Zone::clean() {
+            for (const auto unit : units) {
+                std::thread(&common::markGarbage, unit).detach();
+            }
+
+            for (const auto vehicle : vehicles) {
+                std::thread(&common::markGarbage, vehicle).detach();
+            }
         }
 
         void Zone::spawnCombined(const side& side_, const int units_, const int cars_, const int apcs_, const int ifvs_,
@@ -101,7 +101,7 @@ namespace omega {
             
             //Spawn patrolling infantry
             for (auto i = 0; i < units_; ++i) {
-                spawnInfantryPatrol(5, poolUnits, sqf::east(), 0.5f);
+                spawnInfantryPatrol(4, poolUnits, sqf::east(), 0.5f);
             }
 
             //Spawn vehicles: car
@@ -130,13 +130,24 @@ namespace omega {
             }
         }
 
+        void Zone::spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const object& building_, const float skill_) {
+            const auto grp = sqf::create_group(side_, true);
+            for (auto i = 0; i < sqf::building_pos(building_, -1).size() / 2; ++i) {
+                const auto unit = spawnUnit(pool_.at(common::randomInt(pool_.size() - 1)), sqf::building_pos(building_, round(i * common::randomInt(1) + 1)).at(0), grp, skill_);
+                sqf::do_stop(unit);
+                units.push_back(unit);
+            }
+
+            groupsGarrison.push_back(grp);
+        }
+
         void Zone::spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const float skill_) {
             auto building = sqf::nearest_building(common::findPos(pos, size, 0));
             while (!sqf::in_area(building, pos, size.x, size.y, size.z, false, 0)) {
                 building = sqf::nearest_building(common::findPos(pos, size, 0));
             }
 
-            const auto grp = sqf::create_group(side_);
+            const auto grp = sqf::create_group(side_, true);
             for (auto i = 0; i < sqf::building_pos(building, -1).size() / 2; ++i) {
                 const auto unit = spawnUnit(pool_.at(common::randomInt(pool_.size() - 1)), sqf::building_pos(building, round(i * common::randomInt(1) + 1)).at(0), grp, skill_);
                 sqf::do_stop(unit);
@@ -147,7 +158,7 @@ namespace omega {
         }
 
         void Zone::spawnInfantryPatrol(const int count_, const std::vector<std::string>& pool_, const side& side_, const float skill_) {
-            const auto grp = spawnInfantry(common::findPos(pos, size, 1, 0, 0), count_, pool_, side_, skill_);
+            auto grp = spawnInfantry(common::findPos(pos, size, 1, 0, 0), count_, pool_, side_, skill_);
 
             groupsPatrol.push_back(grp);
             for (const auto unit : sqf::units(grp)) {
@@ -155,11 +166,11 @@ namespace omega {
             }
 
             //Start patrol in new thread
-            std::thread(&Zone::patrol, this, grp).detach();
+            patrol(grp);
         }
 
         void Zone::spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool (&crew_)[2], const float skill_) {
-            const auto grp = sqf::create_group(sd);
+            const auto grp = sqf::create_group(sd, true);
             const auto vehicle = spawnVehicle(pool_.at(common::randomInt(pool_.size() - 1)), common::findPos(pos, size, 10, 0, 10, -1, true), crew_, grp, skill_);
 
             groupsPatrol.push_back(grp);
@@ -184,7 +195,8 @@ namespace omega {
                     "O_Soldier_LAT_F",
                     "O_Sharpshooter_F", 
                     "O_Soldier_SL_F", 
-                    "O_Soldier_TL_F"
+                    "O_Soldier_TL_F",
+                    "O_Soldier_HAT_F"
                 };
                 opfor::units::special = {
                     "O_V_Soldier_hex_F", 
@@ -204,7 +216,8 @@ namespace omega {
                     "O_APC_Tracked_02_cannon_F"
                 };
                 opfor::vehicles::tanks = {
-                    "O_MBT_02_cannon_F"
+                    "O_MBT_02_cannon_F",
+                    "O_MBT_04_cannon_F"
                 };
             }
 

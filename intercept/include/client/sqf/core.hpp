@@ -1,4 +1,4 @@
-﻿/*!
+/*!
 @file
 @author Verox (verox.averre@gmail.com)
 @author Nou (korewananda@gmail.com)
@@ -22,9 +22,15 @@ namespace intercept {
         sqf_return_string call_extension(sqf_string_const_ref extension_, sqf_string_const_ref arguments_);
         std::vector<game_value> call_extension(sqf_string_const_ref extension_, sqf_string_const_ref function_, std::vector<game_value> &arguments_);
 
+        ///Use this to check if fastCall is available. Which calls the engine function directly instead of going through a isNil wrapper
+        bool _has_fast_call();
         //This variant is special in that it works before preInit. The one without args doesn't
         game_value call(const code &code_, game_value args_);
         game_value call(const code &code_);
+        game_value call2(const code &code_, game_value args_);
+        game_value call2(const code &code_);
+        script spawn(game_value args, const code &code_);
+
 
         bool is_nil_code(const code &code_);
         code compile(sqf_string_const_ref sqf_);
@@ -44,7 +50,6 @@ namespace intercept {
         float random(float seed_, float x_, std::optional<float> y_);
         std::vector<game_value> apply(const std::vector<game_value> &array_, const code &code_);
         bool can_suspend();
-        bool is_equal_to(const object &l_, const object &r_);
         float linear_conversion(float min_, float max_, float value_, float new_min_, float new_max_);
         float linear_conversion(float min_, float max_, float value_, float new_min_, float new_max_, bool clamp_);
         script exec_vm(sqf_string_const_ref value_);
@@ -74,15 +79,13 @@ namespace intercept {
 
         void set_variable(const display &display_, sqf_string_const_ref variable_, game_value value_);
         void set_variable(const control &control_, sqf_string_const_ref variable_, game_value value_);
-        void set_variable(const object &object_, sqf_string_const_ref variable_, game_value value_);
-        void set_variable(const object &object_, sqf_string_const_ref variable_, game_value value_, bool public_);
-        void set_variable(const group &group_, sqf_string_const_ref variable_, game_value value_);
+        void set_variable(const object &object_, sqf_string_const_ref variable_, game_value value_, bool public_ = false);
+        void set_variable(const group &group_, sqf_string_const_ref variable_, game_value value_, bool public_ = false);
         void set_variable(const team_member &team_member_, sqf_string_const_ref variable_, game_value value_);
         void set_variable(const task &task_, sqf_string_const_ref variable_, game_value value_);
-        void set_variable(const location &location_, sqf_string_const_ref variable_, game_value value_);
+        void set_variable(const location &location_, sqf_string_const_ref variable_, game_value value_, bool public_ = false);
         
-        void set_variable(const rv_namespace &namespace_, sqf_string_const_ref var_name_, game_value value_);
-        void set_variable(const rv_namespace &namespace_, sqf_string_const_ref var_name_, game_value value_, bool public_);
+        void set_variable(const rv_namespace &namespace_, sqf_string_const_ref var_name_, game_value value_, bool public_ = false);
 
         game_value get_variable(const rv_namespace &namespace_, sqf_string_const_ref var_name_);
         game_value get_variable(const rv_namespace &namespace_, sqf_string_const_ref var_name_, game_value default_value_);
@@ -150,15 +153,15 @@ namespace intercept {
         void on_map_single_click(const game_value &params_, std::variant<sqf_string_const_ref_wrapper, std::reference_wrapper<const code>> command_);
         game_value on_show_new_object(const object &control_, sqf_string_const_ref command_);
         //eventhandler
-        float add_event_handler(const object &object_, sqf_string_const_ref type_, const code &command_);
-        float add_event_handler(const object &object_, sqf_string_const_ref type_, sqf_string_const_ref command_);
+        int add_event_handler(const object &object_, sqf_string_const_ref type_, const code &command_);
+        int add_event_handler(const object &object_, sqf_string_const_ref type_, sqf_string_const_ref command_);
         void remove_event_handler(const object &object_, sqf_string_const_ref event_, int index_);
-        float add_mission_event_handler(sqf_string_const_ref type_, const code &command_);
-        float add_mission_event_handler(sqf_string_const_ref type_, sqf_string_const_ref command_);
+        int add_mission_event_handler(sqf_string_const_ref type_, const code &command_);
+        int add_mission_event_handler(sqf_string_const_ref type_, sqf_string_const_ref command_);
         void remove_all_mission_event_handlers(sqf_string_const_ref value_);
         void remove_all_event_handlers(const object &value0_, sqf_string_const_ref value1_);
         void remove_all_mpevent_handlers(const object &value0_, sqf_string_const_ref value1_);
-        void remove_mission_event_handler(sqf_string_const_ref type_, float index_);
+        void remove_mission_event_handler(sqf_string_const_ref type_, int index_);
         int add_mp_event_handler(const object &object_, sqf_string_const_ref type_, sqf_string_const_ref expression_);
         int add_mp_event_handler(const object &object_, sqf_string_const_ref type_, const code &expression_);
         void remove_mp_event_handler(const object &object_, sqf_string_const_ref event_, int index_);
@@ -222,6 +225,19 @@ namespace intercept {
         int count_type(sqf_string_const_ref type_, const std::vector<object> &objects_);
         int count_unknown(const object &unit_, const std::vector<object> &units_);
         rv_cursor_object_params get_cursor_object_params();
+
+
+        bool is_equal_to(game_value left_, game_value right_);
+        bool is_equal_type(game_value left_, game_value right_);
+        bool is_equal_type_all(game_value value_array_, game_value type_);
+        bool is_equal_type_any(game_value value_, game_value types_array_);
+        bool is_equal_type_array(game_value left_array_, game_value right_array_);
+        bool is_equal_type_params(game_value value_, game_value template_);
+        int get_mission_version();
+
+
+
+
 
     }  // namespace sqf
 }  // namespace intercept

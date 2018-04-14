@@ -1,8 +1,9 @@
 ﻿#include "stdafx.hpp"
 #include "common.hpp"
+#include "global.hpp"
+#include "wrapper.hpp"
 #include <cmath>
 #include <random>
-#include "wrapper.hpp"
 
 #define M_PI 3.14159265358979323846
 
@@ -58,7 +59,7 @@ namespace omega {
                     if (maxGradient_ != -1) {
                         for (size_t i = 0; i < size_; i++) {
                             suitable = true;
-                            auto area = vector3(size_, size_, 0);
+                            const auto area = vector3(size_, size_, 0);
                             if (sqf::surface_normal(randomPos(pos, area)).z < maxGradient_) {
                                 suitable = false;
                             }
@@ -103,6 +104,23 @@ namespace omega {
             return vector3(pos.x, pos.y, 0);
         }
 
+        void markGarbage(const object& object_) {
+            EngineLock engineLock(true);
+            auto players = sqf::all_players();
+
+            while (!object_.is_null() && std::count_if(players.begin(), players.end(), [=](auto& player_) { return common::distance(sqf::get_pos_atl(player_), sqf::get_pos_atl(object_)) < 1000; }) != 0) {
+                players = sqf::all_players();
+
+                engineLock.unlock();
+                Sleep(10000 + common::randomInt(10000));
+                engineLock.lock();
+            }
+
+            if (!object_.is_null()) {
+                sqf::delete_vehicle(object_);
+            }
+        }
+
         object nearestObject(const vector3& pos1_, const std::vector<object>& objects_, const float maxDamage_) {
             auto currentDistance = MAXINT32;
             object closest;
@@ -137,11 +155,9 @@ namespace omega {
         }
 
         vector3 randomPos(const vector3& centre_, const vector3& radius_) {
-            //TODO: take into account rotation (radius_.z)
             const auto dir = randomInt(359);
-            auto pos = vector3((centre_.x) + (std::sin(dir) * (randomInt(static_cast<int>(radius_.x + 1)))),
-                (centre_.y) + (std::cos(dir) * (randomInt(static_cast<int>(radius_.y + 1)))), 0);
-            return pos;
+            return rotate(centre_, vector3((centre_.x) + (std::sin(dir) * (randomInt(static_cast<int>(radius_.x + 1)))),
+                (centre_.y) + (std::cos(dir) * (randomInt(static_cast<int>(radius_.y + 1)))), 0), radius_.z);
         }
 
         vector3 rotate(const vector3& centre_, const vector3& pos_, const float degrees_) {

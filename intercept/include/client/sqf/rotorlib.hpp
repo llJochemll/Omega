@@ -11,8 +11,6 @@
 https://github.com/NouberNou/intercept
 */
 #pragma once
-#include "shared.hpp"
-#include "client/client.hpp"
 #include "shared/client_types.hpp"
 
 using namespace intercept::types;
@@ -20,6 +18,7 @@ using namespace intercept::types;
 namespace intercept {
     namespace sqf {
         struct rv_forces_rtd {
+            explicit rv_forces_rtd(game_value gv_) : roll(gv_[0]), pitch(gv_[1]), collective(gv_[2]) {}
             float roll;
             float pitch;
             float collective;

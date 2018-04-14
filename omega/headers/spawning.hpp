@@ -9,7 +9,7 @@ namespace omega {
 
         class Zone {
         private:
-            void patrol(const group& grp_) const;
+            void patrol(group& grp_) const;
 
         public:
             std::vector<group> groupsGarrison{};
@@ -25,9 +25,10 @@ namespace omega {
             void clean(); //TODO: implement
             void spawnCombined(const side& side_, const int units_ = 0, const int cars_ = 0, const int apcs_ = 0,
                                const int ifvs_ = 0, const int tanks_ = 0, const int boats_ = 0);
-            void spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const float skill_);
-            void spawnInfantryPatrol(const int count_, const std::vector<std::string>& pool_, const side& side_, float skill_);
-            void spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool(&crew_)[2], float skill_);
+            void spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const object& building_, const float skill_ = 0.5f);
+            void spawnInfantryGarrison(const std::vector<std::string>& pool_, const side& side_, const float skill_ = 0.5f);
+            void spawnInfantryPatrol(const int count_, const std::vector<std::string>& pool_, const side& side_, float skill_ = 0.5f);
+            void spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool(&crew_)[2], float skill_ = 0.5f);
         };
 
         namespace pools {

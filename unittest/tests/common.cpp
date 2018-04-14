@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include "common.hpp"
 #include "../source/common.cpp"
+#include "../source/global.cpp"
 #include "../source/wrapper.cpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

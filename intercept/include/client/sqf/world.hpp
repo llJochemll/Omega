@@ -1,4 +1,4 @@
-﻿/*!
+/*!
 @file
 @author Verox (verox.averre@gmail.com)
 @author Nou (korewananda@gmail.com)
@@ -11,8 +11,6 @@ Get information about the game world, wind, waves, date/time, etc.
 https://github.com/NouberNou/intercept
 */
 #pragma once
-#include "shared.hpp"
-#include "client/client.hpp"
 #include "shared/client_types.hpp"
 
 using namespace intercept::types;
@@ -71,7 +69,6 @@ namespace intercept {
         float gusts();
         float humidity();
         float waves();
-        // TODO void set_waves(float lerp_time_, float val_); // TODO
 
         float lightnings();
 

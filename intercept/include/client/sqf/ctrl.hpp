@@ -11,8 +11,6 @@ These are all part of the RV Engine UI system.
 https://github.com/NouberNou/intercept
 */
 #pragma once
-#include "shared.hpp"
-#include "client/client.hpp"
 #include "shared/client_types.hpp"
 
 using namespace intercept::types;
@@ -27,14 +25,14 @@ namespace intercept {
 
             operator game_value() {
                 std::vector<game_value> texts_gv, values_gv, datas_gv;
-                for (auto item : texts) {
-                    texts_gv.push_back(game_value(item));
+                for (auto& item : texts) {
+                    texts_gv.emplace_back(item);
                 }
-                for (auto item : values) {
-                    values_gv.push_back(game_value(item));
+                for (auto& item : values) {
+                    values_gv.emplace_back(item);
                 }
-                for (auto item : datas) {
-                    datas_gv.push_back(game_value(item));
+                for (auto& item : datas) {
+                    datas_gv.emplace_back(item);
                 }
                 return game_value(std::vector<game_value>({texts_gv,
                                                            values_gv,
@@ -44,13 +42,13 @@ namespace intercept {
             operator game_value() const {
                 std::vector<game_value> texts_gv, values_gv, datas_gv;
                 for (auto item : texts) {
-                    texts_gv.push_back(game_value(item));
+                    texts_gv.emplace_back(item);
                 }
                 for (auto item : values) {
-                    values_gv.push_back(game_value(item));
+                    values_gv.emplace_back(item);
                 }
                 for (auto item : datas) {
-                    datas_gv.push_back(game_value(item));
+                    datas_gv.emplace_back(item);
                 }
                 return game_value(std::vector<game_value>({texts_gv,
                                                            values_gv,
@@ -77,8 +75,8 @@ namespace intercept {
             }
 
             static rv_resolution from_vector(const std::vector<float> &resolution_vector_) {
-                vector2 resolution = {resolution_vector_[0], resolution_vector_[1]};
-                vector2 viewport = {resolution_vector_[2], resolution_vector_[3]};
+                const vector2 resolution = {resolution_vector_[0], resolution_vector_[1]};
+                const vector2 viewport = {resolution_vector_[2], resolution_vector_[3]};
                 return rv_resolution(resolution, viewport, resolution_vector_[4], resolution_vector_[5]);
             }
 
@@ -153,8 +151,6 @@ namespace intercept {
         void ctrl_map_anim_clear(const control &value_);
         void ctrl_map_anim_commit(const control &value_);
         void ctrl_map_cursor(const control &ctrl_, sqf_string_const_ref default_cursor_, sqf_string_const_ref new_cursor_);
-        void ctrl_remove_all_event_handlers(const control &value0_, sqf_string_const_ref value1_);
-        void ctrl_remove_event_handler(const control &ctrl_, sqf_string_const_ref name_, float &id_);
         void ctrl_set_active_color(const control &ctrl_, const rv_color &color_);
         void ctrl_set_auto_scroll_delay(const control &value0_, float value1_);
         void ctrl_set_auto_scroll_rewind(const control &value0_, bool value1_);
@@ -188,8 +184,11 @@ namespace intercept {
         vector2 ctrl_map_screen_to_world(const control &ctrl_, const vector2 &screen_pos_);
 
         void ctrl_set_event_handler(const control &ctrl_, sqf_string_const_ref name_, sqf_string_const_ref command_);
-        float ctrl_add_event_handler(const control &ctrl_, sqf_string_const_ref name_, sqf_string_const_ref command_);
-        float ctrl_add_event_handler(const control &ctrl_, sqf_string_const_ref name_, const code &command_);
+        int ctrl_add_event_handler(const control &ctrl_, sqf_string_const_ref name_, sqf_string_const_ref command_);
+        int ctrl_add_event_handler(const control &ctrl_, sqf_string_const_ref name_, const code &command_);
+        void ctrl_remove_all_event_handlers(const control &value0_, sqf_string_const_ref value1_);
+        void ctrl_remove_event_handler(const control &ctrl_, sqf_string_const_ref name_, int id_);
+
 
         //listbox/combobox
         void lnb_delete_column(const control &ctrl_, float index_);
@@ -233,6 +232,10 @@ namespace intercept {
         std::vector<float> lnb_size(const control &ctrl_);
         rv_color lnb_color(float idc_, float row_, float column_);
         rv_color lnb_color(const control &ctrl_, float row_, float column_);
+        void lnb_sort(float idc_, int column_, bool reversed_ = false);
+        void lnb_sort(const control &ctrl_, int column_, bool reversed_ = false);
+        void lnb_sort_by_value(float idc_, int column_, bool reversed_ = false);
+        void lnb_sort_by_value(const control &ctrl_, int column_, bool reversed_ = false);
 
         //listbox
         bool lb_is_selected(const control &value0_, float value1_);
@@ -505,7 +508,7 @@ namespace intercept {
         void draw_icon(const control &ctrl_, sqf_string_const_ref texture_, const rv_color &color_, const vector2 &pos_, float width_, float height_, float angle_, sqf_string_const_ref text_, uint32_t shadow_, float text_size_, sqf_string_const_ref font_, sqf_string_const_ref align_);
         void draw_icon(const control &ctrl_, sqf_string_const_ref texture_, const rv_color &color_, const object &pos_, float width_, float height_, float angle_, sqf_string_const_ref text_, uint32_t shadow_, float text_size_, sqf_string_const_ref font_, sqf_string_const_ref align_);
 
-        void draw_rectangle(const control &ctrl_, const vector2 center_pos_, float a_, float b_, float angle_, const rv_color &color_, sqf_string_const_ref fill_texture_);
+        void draw_rectangle(const control &ctrl_, vector2 center_pos_, float a_, float b_, float angle_, const rv_color &color_, sqf_string_const_ref fill_texture_);
 
         void collapse_object_tree(const control &value_);
         void import_all_groups(const control &value_);
@@ -589,9 +592,8 @@ namespace intercept {
         void lb_sort(const control &control_, sqf_string_const_ref sort_order_);
         void lb_sort(int control_, sqf_string_const_ref sort_order_);
         void lb_sort(int control_);
-        void lb_sort_by_value(const control control_);
+        void lb_sort_by_value(const control& control_);
         void lb_sort_by_value(int control_);
-        void lb_sort_by_value(const control &value_);
 
         sqf_return_string ct_data(const control &control_, int index_);
         std::vector<float> ct_find_header_rows(const control &control_, int index_);
@@ -607,6 +609,8 @@ namespace intercept {
         void ct_set_value(const control &control_, float value_);
         float ct_value(const control &control_, float index_);
         rv_resolution get_resolution();
+        vector2 get_mouse_position();
+        bool is_ui_context();
 
     }  // namespace sqf
 }  // namespace intercept

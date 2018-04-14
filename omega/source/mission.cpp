@@ -13,9 +13,8 @@ namespace omega {
 
         MainMission::MainMission() : Mission() {
             vector3 pos;
-            auto allLocations = locations::all();
             while (true) {
-                pos = allLocations.at(common::randomInt(allLocations.size() - 1));
+                pos = locations::all.at(common::randomInt(locations::all.size() - 1));
                 auto players = sqf::all_players();
                 if (std::count_if(players.begin(), players.end(), [=](auto& player_) { return common::distance(sqf::get_pos_atl(player_), pos) < 2000; }) == 0) {
                     break;
@@ -31,6 +30,13 @@ namespace omega {
             //Spawn garrisoned infantry
             for (auto i = 0; i < 10 + common::randomInt(5); ++i) {
                 zone->spawnInfantryGarrison(spawning::pools::opfor::units::regular, sqf::east(), 0.5f);
+            }
+
+            //Spawn units in military buildings
+            for (const auto building : buildings::military::all) {
+                if (common::distance(sqf::get_pos(building), pos) <= 750) {
+                    zone->spawnInfantryGarrison(spawning::pools::opfor::units::regular, sqf::east(), building, 0.5f);
+                }
             }
 
             //Create marker
@@ -60,6 +66,7 @@ namespace omega {
         void MainMission::finish() const {
             sqf::delete_marker(mrk);
             task::taskSetState("task_" + std::to_string(missionId), "SUCCEEDED");
+            zone->clean();
         }
 
         namespace buildings {
@@ -68,20 +75,17 @@ namespace omega {
             }
 
             namespace military {
+                std::vector<object> all;
                 std::vector<object> towersBig;
                 std::vector<object> towersSmall;
                 std::vector<object> housesBig;
                 std::vector<object> housesSmall;
 
-                std::vector<object> all() {
-                    std::vector<object> all;
-
+                void init() {
                     for (auto vec : { towersBig, towersSmall, housesBig, housesSmall }) {
                         all.reserve(all.size() + vec.size());
                         all.insert(all.end(), vec.begin(), vec.end());
                     }
-
-                    return all;
                 }
             }
             
@@ -126,10 +130,13 @@ namespace omega {
                     "Land_u_Barracks_V2_F",
                     "Land_MilOffices_V1_F"
                 }), common::worldSize().x, false, true);
+
+                military::init();
             }
         }
 
         namespace locations {
+            std::vector<vector3> all;
             std::vector<vector3> airfields;
             std::vector<vector3> bases;
             std::vector<vector3> capitals;
@@ -137,21 +144,20 @@ namespace omega {
             std::vector<vector3> factories;
             std::vector<vector3> villages;
 
-            std::vector<vector3> all() {
-                std::vector<vector3> all;
-
-                for (auto vec : { airfields, capitals, cities, factories, villages }) {
-                    all.reserve(all.size() + vec.size());
-                    all.insert(all.end(), vec.begin(), vec.end());
+            void init() {
+                for (const auto tower : buildings::military::towersBig) {
+                    const auto pos = sqf::get_pos(tower);
+                    if (std::count_if(buildings::military::all.begin(), buildings::military::all.end(), [=](auto& building_) { return common::distance(sqf::get_pos_atl(building_), pos) < 300; }) == 0) {
+                        bases.push_back(sqf::get_pos(tower));
+                    }
                 }
 
-                return all;
-            }
-
-            void init() {
-                //Bases
-                
-                
+                for (const auto house : buildings::military::housesBig) {
+                    const auto pos = sqf::get_pos(house);
+                    if (std::count_if(buildings::military::all.begin(), buildings::military::all.end(), [=](auto& building_) { return common::distance(sqf::get_pos_atl(building_), pos) < 300; }) == 0) {
+                        bases.push_back(sqf::get_pos(house));
+                    }
+                }
 
                 for (const auto location : sqf::nearest_locations(common::worldCentre(), sqf_string_list_const_ref({ "NameCityCapital" }), common::worldSize().x)) {
                     capitals.push_back(sqf::get_pos(location));
@@ -163,6 +169,11 @@ namespace omega {
 
                 for (const auto location : sqf::nearest_locations(common::worldCentre(), sqf_string_list_const_ref({ "NameVillage" }), common::worldSize().x)) {
                     villages.push_back(sqf::get_pos(location));
+                }
+
+                for (auto vec : { airfields, bases, capitals, cities, factories, villages }) {
+                    all.reserve(all.size() + vec.size());
+                    all.insert(all.end(), vec.begin(), vec.end());
                 }
             }
         }

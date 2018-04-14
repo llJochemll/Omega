@@ -43,18 +43,18 @@ namespace omega {
             }
 
             namespace military {
+                extern std::vector<object> all;
                 extern std::vector<object> towersBig;
                 extern std::vector<object> towersSmall;
                 extern std::vector<object> housesBig;
                 extern std::vector<object> housesSmall;
-
-                std::vector<object> all();
             }
 
             void init();
         }
 
         namespace locations {
+            extern std::vector<vector3> all;
             extern std::vector<vector3> airfields;
             extern std::vector<vector3> bases;
             extern std::vector<vector3> capitals;
@@ -62,7 +62,6 @@ namespace omega {
             extern std::vector<vector3> factories;
             extern std::vector<vector3> villages;
 
-            std::vector<vector3> all();
             void init();
         }
     }

@@ -12,7 +12,6 @@ themselves using these functions they are most likely doing something unintentio
 https://github.com/NouberNou/intercept
 */
 #pragma once
-#include "../shared.hpp"
 #include "types.hpp"
 
 using namespace intercept::types;
@@ -35,7 +34,7 @@ namespace intercept {
             /*!
             @brief Invokes a raw nular SQF function from a nular function pointer.
 
-            @params function_ The nular_function pointer.
+            @param function_ The nular_function pointer.
 
             @return rv_game_value The raw returned data from the function.
             */
@@ -45,8 +44,8 @@ namespace intercept {
             /*!
             @brief Invokes a raw unary SQF function from a unary function pointer.
 
-            @params function_ The unary_function pointer.
-            @params right_arg_ A reference to a game_value argument.
+            @param function_ The unary_function pointer.
+            @param right_arg_ A reference to a game_value argument.
 
             @return rv_game_value The raw returned data from the function.
             */
@@ -56,9 +55,9 @@ namespace intercept {
             /*!
             @brief Invokes a raw binary SQF function from a binary function pointer.
 
-            @params function_ The binary_function pointer.
-            @params left_arg_ A reference to a game_value argument for the left side.
-            @params right_arg_ A reference to a game_value argument for the right side.
+            @param function_ The binary_function pointer.
+            @param left_arg_ A reference to a game_value argument for the left side.
+            @param right_arg_ A reference to a game_value argument for the right side.
 
             @return rv_game_value The raw returned data from the function.
             */
@@ -106,10 +105,10 @@ namespace intercept {
             /*!
             @brief Registers SQF Function
             */
-            types::registered_sqf_function(*register_sqf_function)(std::string_view name, std::string_view description, WrapperFunctionBinary function_, types::GameDataType return_arg_type, types::GameDataType left_arg_type, types::GameDataType right_arg_type) { nullptr };
-            types::registered_sqf_function(*register_sqf_function_unary)(std::string_view name, std::string_view description, WrapperFunctionUnary function_, types::GameDataType return_arg_type, types::GameDataType right_arg_type) { nullptr };
-            types::registered_sqf_function(*register_sqf_function_nular)(std::string_view name, std::string_view description, WrapperFunctionNular function_, types::GameDataType return_arg_type) { nullptr };
-            std::pair<types::GameDataType, sqf_script_type>(*register_sqf_type)(std::string_view name, std::string_view localizedName, std::string_view description, std::string_view typeName, script_type_info::createFunc cf) { nullptr };
+            types::registered_sqf_function(*register_sqf_function)(std::string_view name, std::string_view description, WrapperFunctionBinary function_, types::game_data_type return_arg_type, types::game_data_type left_arg_type, types::game_data_type right_arg_type) { nullptr };
+            types::registered_sqf_function(*register_sqf_function_unary)(std::string_view name, std::string_view description, WrapperFunctionUnary function_, types::game_data_type return_arg_type, types::game_data_type right_arg_type) { nullptr };
+            types::registered_sqf_function(*register_sqf_function_nular)(std::string_view name, std::string_view description, WrapperFunctionNular function_, types::game_data_type return_arg_type) { nullptr };
+            std::pair<types::game_data_type, sqf_script_type>(*register_sqf_type)(std::string_view name, std::string_view localizedName, std::string_view description, std::string_view typeName, script_type_info::createFunc cf) { nullptr };
 
 
             //only reachable through wrapper that also passes module_name
