@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="headers\ai.cpp" />
+    <ClCompile Include="respawn.cpp" />
     <ClCompile Include="source\common.cpp" />
     <ClCompile Include="source\core.cpp" />
     <ClCompile Include="source\dllmain.cpp" />
@@ -44,6 +45,7 @@
     <ClInclude Include="headers\targetver.hpp" />
     <ClInclude Include="headers\task.hpp" />
     <ClInclude Include="headers\wrapper.hpp" />
+    <ClInclude Include="respawn.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

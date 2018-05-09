@@ -59,11 +59,11 @@ namespace omega {
 
         void Zone::clean() {
             for (const auto unit : units) {
-                std::thread(&common::markGarbage, unit).detach();
+                common::garbage.push_back(unit);
             }
 
             for (const auto vehicle : vehicles) {
-                std::thread(&common::markGarbage, vehicle).detach();
+                common::garbage.push_back(vehicle);
             }
         }
 
@@ -165,12 +165,11 @@ namespace omega {
                 units.push_back(unit);
             }
 
-            //Start patrol in new thread
             patrol(grp);
         }
 
         void Zone::spawnVehiclePatrol(const std::vector<std::string>& pool_, const bool (&crew_)[2], const float skill_) {
-            const auto grp = sqf::create_group(sd, true);
+            auto grp = sqf::create_group(sd, true);
             const auto vehicle = spawnVehicle(pool_.at(common::randomInt(pool_.size() - 1)), common::findPos(pos, size, 10, 0, 10, -1, true), crew_, grp, skill_);
 
             groupsPatrol.push_back(grp);
@@ -178,6 +177,8 @@ namespace omega {
             for (const auto unit : sqf::crew(vehicle)) {
                 units.push_back(unit);
             }
+
+            patrol(grp);
         }
 
         namespace pools {

@@ -11,18 +11,23 @@ namespace omega {
             missionId = globalMissionId++;
         }
 
+        void Mission::finish() {
+            sqf::delete_marker(mrk);
+            task::taskSetState("task_" + std::to_string(missionId), "SUCCEEDED");
+            zone->clean();
+        }
+
         MainMission::MainMission() : Mission() {
-            vector3 pos;
             while (true) {
                 pos = locations::all.at(common::randomInt(locations::all.size() - 1));
-                auto players = sqf::all_players();
-                if (std::count_if(players.begin(), players.end(), [=](auto& player_) { return common::distance(sqf::get_pos_atl(player_), pos) < 2000; }) == 0) {
+                if (std::count_if(common::allPlayers.begin(), common::allPlayers.end(), [=](auto& player_) { return common::distance(sqf::get_pos_atl(player_), pos) < 2000; }) == 0) {
                     break;
                 }
             }
+            radius = vector3(750, 750, 0);
 
             //Create zone for main AO
-            zone = std::make_unique<spawning::Zone>(pos, vector3(750, 750, 0), sqf::east());
+            zone = std::make_unique<spawning::Zone>(pos, radius, sqf::east());
 
             //Spawn normal units/vehicles
             zone->spawnCombined(sqf::east(), 15 + common::randomInt(5), 4 + common::randomInt(2), 2 + common::randomInt(3), 2 + common::randomInt(2), 1 + common::randomInt(2));
@@ -42,31 +47,85 @@ namespace omega {
             //Create marker
             mrk = sqf::create_marker("mrk_task_" + std::to_string(missionId), pos);
             sqf::set_marker_shape(mrk, "ELLIPSE");
+            sqf::set_marker_brush(mrk, "Border");
             sqf::set_marker_color(mrk, "ColorOPFOR");
-            sqf::set_marker_size(mrk, vector2(750, 750));
-
+            sqf::set_marker_size(mrk, vector2(radius.x, radius.y));
 
             //Create task
             task::taskCreate(sqf::west(), std::vector<std::string>() = {"task_" + std::to_string(missionId)},
                              std::vector<std::string>() = {"Secure the area", "Secure area", "Secure area"}, pos, 1, 10,
                              true, "attack");
+
+            //Random priority mission
+            switch (common::randomInt(1)) {
+            case 0:
+                subMissions.push_back(std::make_unique<RadarPriorityMission>(*this));
+                break;
+            case 1:
+                subMissions.push_back(std::make_unique<RadioPriorityMission>(*this));
+                break;
+            default: ;
+            }
         }
 
-        bool MainMission::complete() const {
-            auto aliveCount = 0;
-            for (const auto unit : zone->units) {
-                if (sqf::alive(unit)) {
-                    aliveCount++;
+        void MainMission::finish() {
+            Mission::finish();
+        }
+
+        void MainMission::update() {
+            done = std::count_if(zone->units.begin(), zone->units.end(), [=](auto& unit_) { return sqf::alive(unit_); }) == 0 && std::count_if(subMissions.begin(), subMissions.end(), [=](auto& mission_) { return !mission_->done; }) == 0;
+
+            for (auto& mission : subMissions) {
+                if (mission->done) return;
+
+                mission->update();
+                if (mission->done) {
+                    mission->finish();
                 }
             }
-
-            return aliveCount < 8;
         }
 
-        void MainMission::finish() const {
-            sqf::delete_marker(mrk);
-            task::taskSetState("task_" + std::to_string(missionId), "SUCCEEDED");
-            zone->clean();
+        PriorityMission::PriorityMission(Mission& mainMission_) : Mission() {
+            pos = common::findPos(mainMission_.pos, mainMission_.radius, 10, 0, 0, 0.975f);
+            radius = vector3(200, 200, 0);
+
+            //Spawn units
+            zone = std::make_unique<spawning::Zone>(pos, radius, sqf::east());
+            zone->spawnCombined(sqf::east(), 4, 1);
+        }
+
+        RadarPriorityMission::RadarPriorityMission(Mission & mainMission_): PriorityMission(mainMission_) {
+            radar = sqf::create_vehicle("Land_Radar_Small_F", pos);
+
+            //Create task
+            task::taskCreate(sqf::west(), std::vector<std::string>() = { "task_" + std::to_string(missionId) },
+                std::vector<std::string>() = { "Priority1", "Priority: destroy radar tower", "Priority3" }, pos, 1, 10, true, "attack");
+        }
+
+        void RadarPriorityMission::finish() {
+            Mission::finish();
+            common::garbage.push_back(radar);
+        }
+
+        void RadarPriorityMission::update() {
+            done = radar.is_nil() || radar.is_null() || !sqf::alive(radar);
+        }
+
+        RadioPriorityMission::RadioPriorityMission(Mission & mainMission_) : PriorityMission(mainMission_) {
+            radio = sqf::create_vehicle("Land_TTowerBig_1_F", pos);
+
+            //Create task
+            task::taskCreate(sqf::west(), std::vector<std::string>() = { "task_" + std::to_string(missionId) },
+                std::vector<std::string>() = { "Priority1", "Priority: destroy radio tower", "Priority3" }, pos, 1, 10, true, "attack");
+        }
+
+        void RadioPriorityMission::finish() {
+            Mission::finish();
+            common::garbage.push_back(radio);
+        }
+
+        void RadioPriorityMission::update() {
+            done = radio.is_nil() || radio.is_null() || !sqf::alive(radio);
         }
 
         namespace buildings {

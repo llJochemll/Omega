@@ -2,6 +2,8 @@
 #include "core.hpp"
 #include "spawning.hpp"
 #include "mission.hpp"
+#include "common.hpp"
+#include "../respawn.hpp"
 
 namespace omega {
     namespace core {
@@ -18,7 +20,15 @@ namespace omega {
         }
 
         void missionLoop() {
-            if (mainMission->complete()) {
+            common::allPlayers = sqf::all_players();
+            common::allUnits = sqf::all_units();
+            common::allVehicles = sqf::vehicles();
+            common::cleanGarbage();
+
+            respawn::vehicles();
+
+            mainMission->update();
+            if (mainMission->done) {
                 mainMission->finish();
                 mainMission = std::make_unique<mission::MainMission>();
             }

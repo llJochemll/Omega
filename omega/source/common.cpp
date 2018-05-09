@@ -9,6 +9,26 @@
 
 namespace omega {
     namespace common {
+        std::vector<group> allGroups;
+        std::vector<object> allPlayers;
+        std::vector<object> allUnits;
+        std::vector<object> allVehicles;
+        std::vector<object> garbage;
+
+        void cleanGarbage() {
+            for (const auto& object : garbage) {
+                if (!object.is_null() && std::count_if(allPlayers.begin(), allPlayers.end(), [=](auto& player_) { return common::distance(sqf::get_pos_atl(player_), sqf::get_pos_atl(object)) < 1000; }) == 0) {
+                    sqf::delete_vehicle(object);
+                }
+            }
+
+            //Remove null objects
+            garbage.erase(std::remove_if(garbage.begin(), garbage.end(), [](const auto& object_) { return object_.is_null(); }), garbage.end());
+
+            //Remove empty groups
+            allGroups.erase(std::remove_if(allGroups.begin(), allGroups.end(), [](const auto& grp_) { return sqf::units(grp_).size() == 0; }), allGroups.end());
+        }
+
         float distance(const vector3& pos1_, const vector3& pos2_) {
             return sqrt(pow(abs(pos1_.x - pos2_.x), 2.0f) + pow(abs(pos1_.y - pos2_.y), 2.0f));
         }
@@ -104,22 +124,7 @@ namespace omega {
             return vector3(pos.x, pos.y, 0);
         }
 
-        void markGarbage(const object& object_) {
-            EngineLock engineLock(true);
-            auto players = sqf::all_players();
-
-            while (!object_.is_null() && std::count_if(players.begin(), players.end(), [=](auto& player_) { return common::distance(sqf::get_pos_atl(player_), sqf::get_pos_atl(object_)) < 1000; }) != 0) {
-                players = sqf::all_players();
-
-                engineLock.unlock();
-                Sleep(10000 + common::randomInt(10000));
-                engineLock.lock();
-            }
-
-            if (!object_.is_null()) {
-                sqf::delete_vehicle(object_);
-            }
-        }
+        
 
         object nearestObject(const vector3& pos1_, const std::vector<object>& objects_, const float maxDamage_) {
             auto currentDistance = MAXINT32;

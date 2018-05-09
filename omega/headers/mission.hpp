@@ -5,24 +5,55 @@
 namespace omega {
     namespace mission {
         class Mission {
-        protected:
+        public:
             inline static int globalMissionId = -1;
+            bool done = false;
             int missionId = -1;
             marker mrk = "";
             std::vector<std::unique_ptr<Mission>> subMissions{};
             vector3 pos = vector3(0,0,0);
+            vector3 radius = vector3(0, 0, 0);
             std::vector<std::string> task{};
             std::unique_ptr<spawning::Zone> zone{};
 
             Mission();
+            virtual ~Mission() = default;
+
+            virtual void finish();
+            virtual void update() = 0;
         };
 
-        class MainMission : Mission {
+        class MainMission : public Mission {
         public:
             MainMission();
 
-            bool complete() const;
-            void finish() const;
+            void finish() override;
+            void update() override;
+        };
+
+        class PriorityMission : public Mission {
+        public:
+            explicit PriorityMission(Mission& mainMission_);
+        };
+
+        class RadarPriorityMission : public PriorityMission {
+        public:
+            object radar;
+
+            explicit RadarPriorityMission(Mission& mainMission_);
+
+            void finish() override;
+            void update() override;
+        };
+
+        class RadioPriorityMission : public PriorityMission {
+        public:
+            object radio;
+
+            explicit RadioPriorityMission(Mission& mainMission_);
+
+            void finish() override;
+            void update() override;
         };
 
         class SideMission : Mission {
@@ -31,10 +62,6 @@ namespace omega {
                 kill,
                 rescue
             };
-        };
-
-        class PriorityMission : Mission {
-
         };
 
         namespace buildings {

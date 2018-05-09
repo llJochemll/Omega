@@ -47,6 +47,9 @@
     <ClCompile Include="source\global.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="respawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\stdafx.hpp">
@@ -80,6 +83,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\global.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="respawn.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
