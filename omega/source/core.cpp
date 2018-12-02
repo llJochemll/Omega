@@ -1,9 +1,10 @@
 ﻿#include "stdafx.hpp"
-#include "core.hpp"
-#include "spawning.hpp"
-#include "mission.hpp"
 #include "common.hpp"
-#include "../respawn.hpp"
+#include "core.hpp"
+#include "global.hpp"
+#include "mission.hpp"
+#include "spawning.hpp"
+
 
 namespace omega {
     namespace core {
@@ -11,6 +12,7 @@ namespace omega {
         std::unique_ptr<mission::SideMission> sideMission;
 
         void missionInit() {
+			randomEngine.seed(time(nullptr));
             mission::buildings::init();
             mission::locations::init();
             spawning::pools::init();
@@ -25,7 +27,7 @@ namespace omega {
             common::allVehicles = sqf::vehicles();
             common::cleanGarbage();
 
-            respawn::vehicles();
+            //respawn::vehicles();
 
             mainMission->update();
             if (mainMission->done) {

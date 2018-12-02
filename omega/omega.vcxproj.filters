@@ -20,9 +20,6 @@
     <ClCompile Include="source\omega.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\spawning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -41,13 +38,10 @@
     <ClCompile Include="source\rsqf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="headers\ai.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\global.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="respawn.cpp">
+    <ClCompile Include="source\spawning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,9 +50,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\targetver.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="headers\spawning.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="headers\common.hpp">
@@ -85,7 +76,7 @@
     <ClInclude Include="headers\global.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="respawn.hpp">
+    <ClInclude Include="headers\spawning.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

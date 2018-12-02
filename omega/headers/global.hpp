@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "stdafx.hpp"
+#include "random"
 
 namespace omega {
 	class EngineLock {
@@ -13,5 +14,7 @@ namespace omega {
 	private:
 		bool locked = false;
 	};
+
+	inline std::default_random_engine randomEngine;
 }
 
